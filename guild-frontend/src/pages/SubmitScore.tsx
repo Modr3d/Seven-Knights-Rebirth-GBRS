@@ -3,11 +3,11 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 
 const BOSSES = [
-  { id: 1, name: "Boss แทโอ" },
-  { id: 2, name: "Boss ไคล์" },
-  { id: 3, name: "Boss คาร์ม่า" },
-  { id: 4, name: "Boss ยอนฮี" },
-  { id: 5, name: "Boss น่องไก่" },
+  { id: 1, name: "Boss แทโอ", img: "/assets/Teo.PNG" },
+  { id: 2, name: "Boss ไคล์", img: "/assets/Kyle.PNG" },
+  { id: 3, name: "Boss คาร์ม่า", img: "/assets/Karma.PNG" },
+  { id: 4, name: "Boss ยอนฮี", img: "/assets/Yeonhee.PNG" },
+  { id: 5, name: "Boss น่องไก่", img: "/assets/Chicken.PNG" },
 ];
 
 export default function SubmitScore() {
@@ -35,22 +35,19 @@ export default function SubmitScore() {
     setMessage("");
 
     try {
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/scores/submit`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            boss_id: selectedBoss,
-            score: Number(score),
-            runs: runs ? Number(runs) : 1,
-            mode, // add หรือ overwrite
-          }),
-        }
-      );
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/scores/submit`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          boss_id: selectedBoss,
+          score: Number(score),
+          runs: runs ? Number(runs) : 1,
+          mode,
+        }),
+      });
 
       const data = await res.json();
       if (!res.ok) setMessage(data.error || "เกิดข้อผิดพลาด");
@@ -77,25 +74,35 @@ export default function SubmitScore() {
     <>
       <Navbar character={character} onLogout={handleLogout} />
 
-      <div className="min-h-screen flex flex-col items-center justify-start pt-12 bg-gray-100">
-        <div className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-md">
+      <div className="min-h-screen flex flex-col items-center bg-gray-100 py-8 px-4">
+        <div className="bg-white shadow-lg rounded-2xl p-6 w-full max-w-md">
           <h2 className="text-2xl font-bold mb-6 text-center">Submit Score</h2>
 
           {/* เลือกบอส */}
           <p className="mb-2 font-medium text-gray-700">เลือกบอส</p>
-          <div className="grid grid-cols-3 gap-3 mb-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
             {BOSSES.map((boss) => (
-              <button
+              <div
                 key={boss.id}
                 onClick={() => setSelectedBoss(boss.id)}
-                className={`py-2 rounded-lg font-semibold text-white transition-colors ${
+                className={`cursor-pointer rounded-xl overflow-hidden shadow-md border bg-white transition ${
                   selectedBoss === boss.id
-                    ? "bg-green-600 hover:bg-green-700"
-                    : "bg-gray-400 hover:bg-gray-500"
+                    ? "ring-2 ring-green-500 opacity-100"
+                    : "opacity-70"
                 }`}
               >
-                {boss.name}
-              </button>
+                <img
+                  src={boss.img}
+                  alt={boss.name}
+                  className={`w-full h-28 object-cover transition ${
+                    selectedBoss === boss.id ? "grayscale-0" : "grayscale"
+                  }`}
+                />
+
+                <p className="text-center font-semibold py-2 text-sm bg-gray-50">
+                  {boss.name}
+                </p>
+              </div>
             ))}
           </div>
 
@@ -117,9 +124,9 @@ export default function SubmitScore() {
             className="w-full p-3 mb-4 border rounded-lg"
           />
 
-          {/* เลือกโหมด add หรือ overwrite */}
+          {/* โหมดบันทึก */}
           <p className="mb-2 font-medium text-gray-700">โหมดการบันทึก</p>
-          <div className="flex gap-4 mb-4">
+          <div className="flex flex-col gap-2 mb-6">
             <label className="flex items-center gap-2">
               <input
                 type="radio"
@@ -130,6 +137,7 @@ export default function SubmitScore() {
               />
               บวกคะแนนจากของเดิม
             </label>
+
             <label className="flex items-center gap-2">
               <input
                 type="radio"
@@ -142,17 +150,19 @@ export default function SubmitScore() {
             </label>
           </div>
 
-          {/* ปุ่ม submit */}
+          {/* submit */}
           <button
             onClick={submit}
             disabled={loading}
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl font-semibold mb-4"
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl font-semibold transition"
           >
             {loading ? "กำลังบันทึก..." : "Submit"}
           </button>
 
           {message && (
-            <p className="text-center mt-4 text-red-500 font-semibold">{message}</p>
+            <p className="text-center mt-4 text-red-500 font-semibold">
+              {message}
+            </p>
           )}
         </div>
       </div>
