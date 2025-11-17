@@ -1,5 +1,3 @@
-console.log("[scores.ts] loaded");
-
 import { Router } from "express";
 import { supabase } from "../supabase";
 import { authMiddleware } from "../middleware/auth";

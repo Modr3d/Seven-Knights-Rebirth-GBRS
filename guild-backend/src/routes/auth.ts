@@ -27,16 +27,48 @@ router.post("/request-otp", async (req, res) => {
 
     const discordId = charData.discord_id;
 
+    // Clean-up OTP หมดอายุอัตโนมัติ
+    await supabase
+      .from("otp_codes")
+      .delete()
+      .lt("expires_at", new Date());
+
+    // ตรวจสอบ OTP ล่าสุดของ character สำหรับ rate limit 8 ชั่วโมง
+    const { data: lastOtpData, error: lastOtpError } = await supabase
+      .from("otp_codes")
+      .select("created_at")
+      .eq("character", character)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (lastOtpError) {
+      console.error("[Request OTP] Failed to check last OTP", lastOtpError);
+      return res.status(500).json({ error: "Failed to check OTP history" });
+    }
+
+    if (lastOtpData) {
+      const lastRequestTime = new Date(lastOtpData.created_at);
+      const now = new Date();
+      const diffHours = (now.getTime() - lastRequestTime.getTime()) / (1000 * 60 * 60);
+      if (diffHours < 8) {
+        return res.status(429).json({
+          error: "You can request OTP only once every 8 hours",
+          retry_after_hours: +(8 - diffHours).toFixed(2)
+        });
+      }
+    }
+
     // ส่ง OTP ผ่าน Discord Bot และรับ OTP จริงกลับมา
     const otp = await sendOtpToDiscord(discordId);
 
-    const expires_at = new Date(Date.now() + 5 * 60 * 1000); // หมดอายุ 5 นาที
+    const expires_at = new Date(Date.now() + 60 * 60 * 1000); // OTP หมดอายุ 1 ชั่วโมง
 
     // บันทึก OTP จริงลง Supabase
     const { error } = await supabase.from("otp_codes").insert({
       discord_id: discordId,
       character,
-      otp, // ใช้ OTP ที่ generate จาก sendOtpToDiscord
+      otp,
       created_at: new Date(),
       expires_at,
     });
@@ -94,7 +126,6 @@ router.post("/verify-otp", async (req, res) => {
 
     const guildmember_id = gmData.id;
 
-    // สร้าง JWT พร้อม guildmember_id
     const token = jwt.sign(
       { character, guildmember_id },
       process.env.JWT_SECRET!,
