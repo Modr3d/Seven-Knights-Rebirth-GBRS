@@ -23,8 +23,8 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "allowImportingTsExtensions": false,  // ปิดไป
-    "noEmit": false  // ต้องแปลงไฟล์ออกมา
+    "allowImportingTsExtensions": false,
+    "noEmit": false
   },
   "include": ["src"]
 }
