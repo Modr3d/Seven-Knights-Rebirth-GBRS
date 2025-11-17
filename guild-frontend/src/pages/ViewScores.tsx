@@ -75,7 +75,7 @@ export default function ViewScores() {
 
       <div className="min-h-screen flex flex-col items-center pt-12 bg-gray-100">
         <div className="bg-white shadow-lg rounded-2xl p-6 w-full max-w-3xl">
-          <h2 className="text-2xl font-bold mb-6 text-center">View Scores</h2>
+          <h2 className="text-2xl font-bold mb-6 text-center">ผลสรุปคะแนนของซีซั่นปัจจุบัน</h2>
 
           {loading ? (
             <p className="text-center text-gray-600">กำลังโหลด...</p>

@@ -10,16 +10,17 @@ export default function Navbar({ character, onLogout }: NavbarProps) {
   const [open, setOpen] = useState(false);
 
   return (
-    <nav className="w-full bg-gray-800 text-white p-4">
-      <div className="max-w-5xl mx-auto flex justify-between items-center">
+    <nav className="w-full bg-gray-800 text-white">
+      <div className="flex justify-between items-center px-4 md:px-8 py-4 w-full">
+        {/* Logo */}
         <div className="font-bold text-xl">RoyalBreaker</div>
 
         {/* Hamburger (มือถือ) */}
         <button
-          className="md:hidden block"
+          className="md:hidden text-2xl"
           onClick={() => setOpen(!open)}
         >
-          <span className="text-2xl">☰</span>
+          ☰
         </button>
 
         {/* เมนูปกติ (Desktop) */}
@@ -61,7 +62,7 @@ export default function Navbar({ character, onLogout }: NavbarProps) {
 
       {/* เมนูมือถือ (Mobile Dropdown) */}
       {character && open && (
-        <div className="md:hidden mt-4 space-y-2 bg-gray-700 p-4 rounded-lg">
+        <div className="md:hidden mt-2 space-y-2 bg-gray-700 p-4 rounded-b-lg">
           <NavLink
             to="/submit"
             className={({ isActive }) =>

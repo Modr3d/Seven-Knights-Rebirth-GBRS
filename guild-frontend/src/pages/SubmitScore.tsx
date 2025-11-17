@@ -29,7 +29,18 @@ export default function SubmitScore() {
     const token = localStorage.getItem("token");
     if (!token) return setMessage("กรุณาล็อกอินก่อน");
     if (!selectedBoss) return setMessage("กรุณาเลือกบอส");
-    if (!score) return setMessage("กรุณากรอกคะแนน");
+
+    const scoreNum = Number(score);
+    const runsNum = runs ? Number(runs) : 1;
+
+    // Validation
+    if (isNaN(scoreNum)) return setMessage("กรุณากรอกคะแนนเป็นตัวเลข");
+    if (scoreNum < 0) return setMessage("คะแนนต้องไม่น้อยกว่า 0");
+    if (scoreNum > 6_000_000) return setMessage("คะแนนต้องไม่เกิน 6,000,000");
+
+    if (isNaN(runsNum)) return setMessage("กรุณากรอกรอบตีเป็นตัวเลข");
+    if (runsNum < 1) return setMessage("รอบตีต้องไม่น้อยกว่า 1");
+    if (runsNum > 13) return setMessage("รอบตีต้องไม่เกิน 13");
 
     setLoading(true);
     setMessage("");
@@ -43,8 +54,8 @@ export default function SubmitScore() {
         },
         body: JSON.stringify({
           boss_id: selectedBoss,
-          score: Number(score),
-          runs: runs ? Number(runs) : 1,
+          score: scoreNum,
+          runs: runsNum,
           mode,
         }),
       });
@@ -76,7 +87,9 @@ export default function SubmitScore() {
 
       <div className="min-h-screen flex flex-col items-center bg-gray-100 py-8 px-4">
         <div className="bg-white shadow-lg rounded-2xl p-6 w-full max-w-md">
-          <h2 className="text-2xl font-bold mb-6 text-center">Submit Score</h2>
+          <h2 className="text-2xl font-bold mb-6 text-center">
+            Advent Expedition Score Report
+          </h2>
 
           {/* เลือกบอส */}
           <p className="mb-2 font-medium text-gray-700">เลือกบอส</p>
@@ -112,15 +125,19 @@ export default function SubmitScore() {
             placeholder="คะแนน"
             value={score}
             onChange={(e) => setScore(e.target.value)}
+            min={0}
+            max={6000000}
             className="w-full p-3 mb-4 border rounded-lg"
           />
 
           {/* ใส่รอบ */}
           <input
             type="number"
-            placeholder="รอบตีที่ใช้ (ถ้าไม่กรอกจะถือว่าเป็น 1)"
+            placeholder="รอบตีที่ใช้ (1-13 | ถ้าไม่กรอกถือว่าเป็น 1)"
             value={runs}
             onChange={(e) => setRuns(e.target.value)}
+            min={1}
+            max={13}
             className="w-full p-3 mb-4 border rounded-lg"
           />
 
