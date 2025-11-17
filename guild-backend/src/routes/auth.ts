@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { supabase } from "../supabase.ts";
+import { supabase } from "../supabase";
 import jwt from "jsonwebtoken";
-import { sendOtpToDiscord } from "../services/discord-otp.ts";
+import { sendOtpToDiscord } from "../services/discord-otp";
 
 const router = Router();
 

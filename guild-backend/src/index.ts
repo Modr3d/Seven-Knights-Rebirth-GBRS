@@ -2,9 +2,9 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 
-import authRoutes from "./routes/auth.ts";
-import scoreRoutes from "./routes/scores.ts";
-import charactersRoutes from "./routes/characters.ts";
+import authRoutes from "./routes/auth";
+import scoreRoutes from "./routes/scores";
+import charactersRoutes from "./routes/characters";
 
 dotenv.config();
 

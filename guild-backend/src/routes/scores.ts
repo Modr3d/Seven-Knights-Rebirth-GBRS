@@ -1,9 +1,9 @@
 console.log("[scores.ts] loaded");
 
 import { Router } from "express";
-import { supabase } from "../supabase.ts";
-import { authMiddleware } from "../middleware/auth.ts";
-import type { AuthRequest } from "../middleware/auth.ts";
+import { supabase } from "../supabase";
+import { authMiddleware } from "../middleware/auth";
+import type { AuthRequest } from "../middleware/auth";
 
 const router = Router();
 
