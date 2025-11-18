@@ -3,17 +3,16 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 
 const BOSSES = [
-  { id: 1, name: "Boss แทโอ" },
-  { id: 2, name: "Boss ไคล์" },
-  { id: 3, name: "Boss คาร์ม่า" },
-  { id: 4, name: "Boss ยอนฮี" },
-  { id: 5, name: "Boss น่องไก่" },
+  { id: 1, name: "Boss แทโอ", img: "/assets/Teo.PNG" },
+  { id: 2, name: "Boss ไคล์", img: "/assets/Kyle.PNG" },
+  { id: 3, name: "Boss คาร์ม่า", img: "/assets/Karma.PNG" },
+  { id: 4, name: "Boss ยอนฮี", img: "/assets/Yeonhee.PNG" },
+  { id: 5, name: "Boss น่องไก่", img: "/assets/Chicken.PNG" },
 ];
 
 interface ScoreRecord {
   character: string;
   boss_id: number;
-  boss_name: string;
   score: number;
   runs: number;
 }
@@ -24,6 +23,8 @@ export default function ViewScores() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [character, setCharacter] = useState<string | null>(null);
+
+  const [selectedBoss, setSelectedBoss] = useState<number | null>(null);
 
   useEffect(() => {
     const tokenCharacter = localStorage.getItem("character");
@@ -45,6 +46,7 @@ export default function ViewScores() {
         const res = await fetch(`${import.meta.env.VITE_API_URL}/scores/list`, {
           headers: { Authorization: `Bearer ${token}` },
         });
+
         const data = await res.json();
         if (!res.ok) {
           if (res.status === 401) navigate("/login");
@@ -69,13 +71,50 @@ export default function ViewScores() {
     navigate("/login");
   };
 
+  const characters = Array.from(new Set(scores.map((s) => s.character)));
+
+  const filteredBosses = selectedBoss
+    ? BOSSES.filter((b) => b.id === selectedBoss)
+    : BOSSES;
+
   return (
     <>
       <Navbar character={character} onLogout={handleLogout} />
 
       <div className="min-h-screen flex flex-col items-center pt-12 bg-gray-100">
-        <div className="bg-white shadow-lg rounded-2xl p-6 w-full max-w-3xl">
-          <h2 className="text-2xl font-bold mb-6 text-center">ผลสรุปคะแนนของซีซั่นปัจจุบัน</h2>
+        <div className="bg-white shadow-lg rounded-2xl p-6 w-full max-w-4xl">
+          <h2 className="text-2xl font-bold mb-6 text-center">
+            ผลสรุปคะแนนของซีซั่นปัจจุบัน
+          </h2>
+
+          <div className="w-full overflow-x-auto mb-8">
+            <div className="grid grid-cols-5 gap-4 min-w-[650px]">
+              {BOSSES.map((boss) => (
+                <div
+                  key={boss.id}
+                  onClick={() =>
+                    setSelectedBoss(selectedBoss === boss.id ? null : boss.id)
+                  }
+                  className={`cursor-pointer rounded-xl overflow-hidden shadow-md border bg-white transition ${
+                    selectedBoss === boss.id
+                      ? "ring-2 ring-purple-600 opacity-100"
+                      : "opacity-70"
+                  }`}
+                >
+                  <img
+                    src={boss.img}
+                    alt={boss.name}
+                    className={`w-full h-24 object-cover transition ${
+                      selectedBoss === boss.id ? "grayscale-0" : "grayscale"
+                    }`}
+                  />
+                  <p className="text-center font-semibold py-2 text-sm bg-gray-50">
+                    {boss.name}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
 
           {loading ? (
             <p className="text-center text-gray-600">กำลังโหลด...</p>
@@ -87,27 +126,61 @@ export default function ViewScores() {
                 <thead className="bg-gray-200">
                   <tr>
                     <th className="py-2 px-4 border">Character</th>
-                    {BOSSES.map((boss) => (
-                      <th key={boss.id} className="py-2 px-4 border">{boss.name}</th>
+
+                    {filteredBosses.map((boss) => (
+                      <th key={boss.id} className="py-2 px-4 border">
+                        {boss.name}
+                      </th>
                     ))}
+
+                    <th className="py-2 px-4 border">คะแนนรวม</th>
+                    <th className="py-2 px-4 border w-40">รอบตี (ใช้/เหลือ)</th>
                   </tr>
                 </thead>
+
                 <tbody>
-                  {Array.from(new Set(scores.map(s => s.character))).map((char) => (
-                    <tr key={char} className="text-center">
-                      <td className="py-2 px-4 border">{char}</td>
-                      {BOSSES.map((boss) => {
-                        const record = scores.find(
-                          (s) => s.character === char && s.boss_id === boss.id
-                        );
-                        return (
-                          <td key={boss.id} className="py-2 px-4 border">
-                            {record ? `${record.score} (${record.runs} ไม้)` : "-"}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  ))}
+                  {characters.map((char) => {
+                    const records = scores.filter((s) => s.character === char);
+
+                    const totalScore = records.reduce(
+                      (sum, r) => sum + r.score,
+                      0
+                    );
+
+                    const totalRuns = records.reduce(
+                      (sum, r) => sum + r.runs,
+                      0
+                    );
+
+                    const remainingRuns = Math.max(0, 13 - totalRuns);
+
+                    return (
+                      <tr key={char} className="text-center">
+                        <td className="py-2 px-4 border font-bold">{char}</td>
+
+                        {filteredBosses.map((boss) => {
+                          const record = records.find(
+                            (r) => r.boss_id === boss.id
+                          );
+                          return (
+                            <td key={boss.id} className="py-2 px-4 border">
+                              {record
+                                ? `${record.score} (${record.runs} ไม้)`
+                                : "-"}
+                            </td>
+                          );
+                        })}
+
+                        <td className="py-2 px-4 border font-semibold text-blue-700">
+                          {totalScore}
+                        </td>
+
+                        <td className="py-2 px-4 border font-semibold text-green-700">
+                          {totalRuns} / {remainingRuns}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
