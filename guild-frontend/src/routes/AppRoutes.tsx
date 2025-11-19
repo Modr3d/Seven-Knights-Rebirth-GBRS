@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "../pages/Login";
 import SubmitScore from "../pages/SubmitScore";
 import ViewScores from "../pages/ViewScores";
+import AttackOrderPage from "../pages/AttackOrderPage";
 import PrivateRoute from "./PrivateRoute";
 
 export default function AppRoutes() {
@@ -26,6 +27,16 @@ export default function AppRoutes() {
         element={
           <PrivateRoute>
             <ViewScores />
+          </PrivateRoute>
+        }
+      />
+
+      {/* หน้าแจ้งลำดับการตีบอส */}
+      <Route
+        path="/attackorder"
+        element={
+          <PrivateRoute>
+            <AttackOrderPage />
           </PrivateRoute>
         }
       />

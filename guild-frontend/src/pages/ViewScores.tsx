@@ -77,6 +77,49 @@ export default function ViewScores() {
     ? BOSSES.filter((b) => b.id === selectedBoss)
     : BOSSES;
 
+  // Export CSV
+  const handleExportCSV = () => {
+    // Header CSV: ใส่ Character + score/runs ของแต่ละบอส + Total + Runs
+    const header = ["Character"];
+    filteredBosses.forEach((b) => {
+      header.push(`${b.name}_score`);
+      header.push(`${b.name}_runs`);
+    });
+    header.push("Total_Score", "Runs_Used", "Runs_Left");
+
+    const rows: string[] = [];
+
+    characters.forEach((char) => {
+      const records = scores.filter((s) => s.character === char);
+      const row: any[] = [char];
+
+      filteredBosses.forEach((boss) => {
+        const record = records.find((r) => r.boss_id === boss.id);
+        row.push(record ? record.score : 0);
+        row.push(record ? record.runs : 0);
+      });
+
+      const totalScore = records.reduce((sum, r) => sum + r.score, 0);
+      const totalRuns = records.reduce((sum, r) => sum + r.runs, 0);
+      const runsLeft = Math.max(0, 14 - totalRuns);
+
+      row.push(totalScore, totalRuns, runsLeft);
+      rows.push(row.join(","));
+    });
+
+    // รวม Header + Rows
+    const csvContent = [header.join(","), ...rows].join("\n");
+
+    // สร้างไฟล์ CSV พร้อมดาวน์โหลดชื่อไฟล์ชัดเจน
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "scores_for_ai.csv"; // <- ชื่อไฟล์ชัดเจน
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <>
       <Navbar character={character} onLogout={handleLogout} />
@@ -86,6 +129,16 @@ export default function ViewScores() {
           <h2 className="text-2xl font-bold mb-6 text-center">
             ผลสรุปคะแนนของซีซั่นปัจจุบัน
           </h2>
+
+          {/* NEW: ปุ่ม Export CSV */}
+          <div className="flex justify-end mb-4">
+            <button
+              onClick={handleExportCSV}
+              className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow"
+            >
+              Export CSV
+            </button>
+          </div>
 
           <div className="w-full overflow-x-auto mb-8">
             <div className="grid grid-cols-5 gap-4 min-w-[650px]">
@@ -152,7 +205,7 @@ export default function ViewScores() {
                       0
                     );
 
-                    const remainingRuns = Math.max(0, 13 - totalRuns);
+                    const remainingRuns = Math.max(0, 14 - totalRuns);
 
                     return (
                       <tr key={char} className="text-center">

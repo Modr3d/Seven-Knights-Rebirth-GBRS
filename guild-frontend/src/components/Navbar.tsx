@@ -16,10 +16,7 @@ export default function Navbar({ character, onLogout }: NavbarProps) {
         <div className="font-bold text-xl">RoyalBreaker</div>
 
         {/* Hamburger (มือถือ) */}
-        <button
-          className="md:hidden text-2xl"
-          onClick={() => setOpen(!open)}
-        >
+        <button className="md:hidden text-2xl" onClick={() => setOpen(!open)}>
           ☰
         </button>
 
@@ -34,7 +31,7 @@ export default function Navbar({ character, onLogout }: NavbarProps) {
                 }`
               }
             >
-              Submit Score
+              แจ้งคะแนนบอส
             </NavLink>
 
             <NavLink
@@ -45,7 +42,18 @@ export default function Navbar({ character, onLogout }: NavbarProps) {
                 }`
               }
             >
-              View Scores
+              เช็คคะแนนรวม
+            </NavLink>
+
+            <NavLink
+              to="/attackorder"
+              className={({ isActive }) =>
+                `px-3 py-1 rounded ${
+                  isActive ? "bg-green-600" : "hover:bg-gray-700"
+                }`
+              }
+            >
+              ลำดับการตีบอส
             </NavLink>
 
             <span>Hi, {character}</span>
