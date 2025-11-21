@@ -12,7 +12,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [characters, setCharacters] = useState<string[]>([]);
-  const navigate = useNavigate(); // <-- เพิ่มตรงนี้
+  const navigate = useNavigate();
 
   const API_URL = import.meta.env.VITE_API_URL;
 
@@ -62,7 +62,7 @@ export default function Login() {
         localStorage.setItem("character", character);
         setMessage("ล็อกอินสำเร็จ!");
 
-        navigate("/submit"); // <-- redirect หลัง login
+        navigate("/submit");
       }
     } catch {
       setMessage("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
@@ -73,8 +73,12 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">Guild Login</h2>
-
+        <h2 className="text-2xl font-bold mb-2 text-center">Guild Login</h2>
+        <img
+          className="flex w-60 mb-2 justify-self-center"
+          src="/assets/7k-icon.png"
+          alt="7k-icon"
+        ></img>
         {/* Character Select */}
         <label className="block mb-2 font-medium text-gray-700">
           เลือกตัวละคร
