@@ -53,7 +53,7 @@ export default function AttackOrderPage() {
 
       <div className="min-h-screen flex flex-col items-center pt-12 bg-gray-100">
         <div className="bg-white shadow-lg rounded-2xl p-6 w-full max-w-2xl">
-          <h2 className="text-2xl font-bold mb-6 text-center">Boss Order (เทสระบบ, Not actual data)</h2>
+          <h2 className="text-2xl font-bold mb-6 text-center">Boss Order (อยู่ระหว่างการพัฒนา ผิดพลาดขออภัย)</h2>
 
           {loading && <p className="text-center">กำลังโหลด...</p>}
           {error && <p className="text-center text-red-500">{error}</p>}

@@ -91,10 +91,9 @@ router.post("/submit", authMiddleware, async (req: AuthRequest, res) => {
 });
 
 
-// GET LIST
 router.get("/list", authMiddleware, async (req: AuthRequest, res) => {
   try {
-    // ใช้ raw SQL query เพื่อ join tbl_guildmember
+    // ใช้ RPC
     const { data, error } = await supabase.rpc("get_scores_with_names");
 
     if (error) {
@@ -102,9 +101,10 @@ router.get("/list", authMiddleware, async (req: AuthRequest, res) => {
       return res.status(500).json({ error: "Failed to fetch scores" });
     }
 
-    // map ให้ React ใช้ character ได้
+    // ส่ง member_id กลับไปด้วย
     const formatted = (data as any[]).map((row) => ({
-      character: row.name,
+      member_id: row.guildmember_id,   // <- เพิ่มอันนี้
+      character: row.name,             // UI ยังใช้ name อยู่
       boss_id: row.boss_id,
       score: row.score,
       runs: row.runs,

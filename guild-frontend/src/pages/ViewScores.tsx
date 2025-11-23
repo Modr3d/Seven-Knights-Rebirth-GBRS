@@ -11,7 +11,8 @@ const BOSSES = [
 ];
 
 interface ScoreRecord {
-  character: string;
+  member_id: number; // สำหรับ CSV
+  character: string; // สำหรับแสดงชื่อ
   boss_id: number;
   score: number;
   runs: number;
@@ -71,7 +72,12 @@ export default function ViewScores() {
     navigate("/login");
   };
 
-  const characters = Array.from(new Set(scores.map((s) => s.character)));
+  // เก็บ unique member_id และ map ไปยังชื่อ
+  const members = Array.from(new Set(scores.map((s) => s.member_id)));
+  const memberNameMap: Record<number, string> = {};
+  scores.forEach((s) => {
+    memberNameMap[s.member_id] = s.character;
+  });
 
   const filteredBosses = selectedBoss
     ? BOSSES.filter((b) => b.id === selectedBoss)
@@ -79,8 +85,7 @@ export default function ViewScores() {
 
   // Export CSV
   const handleExportCSV = () => {
-    // Header CSV: ใส่ Character + score/runs ของแต่ละบอส + Total + Runs
-    const header = ["Character"];
+    const header = ["member_id"];
     filteredBosses.forEach((b) => {
       header.push(`${b.name}_score`);
       header.push(`${b.name}_runs`);
@@ -89,9 +94,9 @@ export default function ViewScores() {
 
     const rows: string[] = [];
 
-    characters.forEach((char) => {
-      const records = scores.filter((s) => s.character === char);
-      const row: any[] = [char];
+    members.forEach((id) => {
+      const records = scores.filter((s) => s.member_id === id);
+      const row: any[] = [id]; // CSV ใช้ member_id
 
       filteredBosses.forEach((boss) => {
         const record = records.find((r) => r.boss_id === boss.id);
@@ -107,15 +112,13 @@ export default function ViewScores() {
       rows.push(row.join(","));
     });
 
-    // รวม Header + Rows
     const csvContent = [header.join(","), ...rows].join("\n");
 
-    // สร้างไฟล์ CSV พร้อมดาวน์โหลดชื่อไฟล์ชัดเจน
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "scores_for_ai.csv"; // <- ชื่อไฟล์ชัดเจน
+    a.download = "scores_for_ai.csv";
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -130,7 +133,6 @@ export default function ViewScores() {
             ผลสรุปคะแนนของซีซั่นปัจจุบัน
           </h2>
 
-          {/* NEW: ปุ่ม Export CSV */}
           <div className="flex justify-end mb-4">
             <button
               onClick={handleExportCSV}
@@ -192,8 +194,8 @@ export default function ViewScores() {
                 </thead>
 
                 <tbody>
-                  {characters.map((char) => {
-                    const records = scores.filter((s) => s.character === char);
+                  {members.map((id) => {
+                    const records = scores.filter((s) => s.member_id === id);
 
                     const totalScore = records.reduce(
                       (sum, r) => sum + r.score,
@@ -208,8 +210,10 @@ export default function ViewScores() {
                     const remainingRuns = Math.max(0, 14 - totalRuns);
 
                     return (
-                      <tr key={char} className="text-center">
-                        <td className="py-2 px-4 border font-bold">{char}</td>
+                      <tr key={id} className="text-center">
+                        <td className="py-2 px-4 border font-bold">
+                          {memberNameMap[id]} {/* แสดงชื่อ */}
+                        </td>
 
                         {filteredBosses.map((boss) => {
                           const record = records.find(
