@@ -95,6 +95,18 @@ export default function Navbar({ character, onLogout }: NavbarProps) {
             View Scores
           </NavLink>
 
+          <NavLink
+            to="/attackorder"
+            className={({ isActive }) =>
+              `block px-3 py-2 rounded ${
+                isActive ? "bg-green-600" : "hover:bg-gray-600"
+              }`
+            }
+            onClick={() => setOpen(false)}
+          >
+            ลำดับการตีบอส
+          </NavLink>
+
           <div className="text-white">Hi, {character}</div>
 
           <button
