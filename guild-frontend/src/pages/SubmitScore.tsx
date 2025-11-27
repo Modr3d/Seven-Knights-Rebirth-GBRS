@@ -36,7 +36,6 @@ export default function SubmitScore() {
     // Validation
     if (isNaN(scoreNum)) return setMessage("กรุณากรอกคะแนนเป็นตัวเลข");
     if (scoreNum < 0) return setMessage("คะแนนต้องไม่น้อยกว่า 0");
-    if (scoreNum > 6_000_000) return setMessage("คะแนนต้องไม่เกิน 6,000,000");
 
     if (isNaN(runsNum)) return setMessage("กรุณากรอกรอบตีเป็นตัวเลข");
     if (runsNum < 1) return setMessage("รอบตีต้องไม่น้อยกว่า 1");
